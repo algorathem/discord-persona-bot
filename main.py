@@ -1,9 +1,13 @@
 import discord
 from discord.ext import commands
+import threading
 import os
 import sys
+from http.server import HTTPServer, BaseHTTPRequestHandler
 from dotenv import load_dotenv
+
 load_dotenv()
+
 BOT_OWNER_ID = os.getenv("BOT_OWNER_ID")
 if not BOT_OWNER_ID:
     print("ERROR: BOT_OWNER_ID environment variable is not set!")
@@ -116,6 +120,18 @@ async def say(ctx, avatar_name: str, *, message: str):
         await ctx.message.delete()
     except discord.DiscordException:
         pass
+
+class HealthHandler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.end_headers()
+        self.wfile.write(b"Bot is running!")
+
+def run_server():
+    server = HTTPServer(("0.0.0.0", 8080), HealthHandler)
+    server.serve_forever()
+
+threading.Thread(target=run_server).start()
 
 TOKEN = os.getenv("DISCORD_TOKEN")
 if not TOKEN:
