@@ -12,6 +12,7 @@ from rss_bot.rss import RSSReader
 from rss_bot.message import format_entry_for_discord
 from rss_bot.models import FeedConfig
 
+import yaml 
 load_dotenv()
 
 TOKEN = os.getenv("DISCORD_TOKEN")
@@ -121,7 +122,31 @@ async def say(ctx, avatar: str, *, message: str):
 async def main():
     logging.basicConfig(level=logging.INFO)
 
-    config = load_config(CONFIG_PATH)
+    # 1. Try to load from Environment Variable first
+    yaml_content = os.getenv("MY_CONFIG_YAML")
+    
+    if yaml_content:
+        logging.info("Loading configuration directly from MY_CONFIG_YAML environment variable.")
+        try:
+            # Parse the string directly
+            config_dict = yaml.safe_load(yaml_content)
+            
+            # Use your FeedConfig model or whatever load_config usually returns
+            # If load_config returns a custom class, we manually reconstruct it here:
+            from rss_bot.models import Config # Ensure you import the right Config class
+            config = Config(**config_dict)
+            
+        except Exception as e:
+            logging.error(f"Failed to parse YAML from environment variable: {e}")
+            sys.exit(1)
+    else:
+        # 2. Fallback to local file if variable is missing
+        logging.info(f"Environment variable MY_CONFIG_YAML not found. Falling back to {CONFIG_PATH}")
+        if not os.path.exists(CONFIG_PATH):
+            logging.error(f"Config file NOT found at {CONFIG_PATH}. Bot cannot start.")
+            sys.exit(1)
+        config = load_config(CONFIG_PATH)
+
     rss_reader = RSSReader(config)
     await rss_reader.setup()
 
