@@ -1,2 +1,9 @@
-discord.py
+discord>=2.3.2,<3.0.0
 python-dotenv
+feedparser
+audioop-lts>=0.2.1,<0.3.0
+pyyaml>=6.0.2,<7.0.0
+reader>=3.16,<4.0
+pydantic>=2.10.6,<3.0.0
+markdownify>=0.14.1,<0.15.0
+beautifulsoup4>=4.13.2,<5.0.0
