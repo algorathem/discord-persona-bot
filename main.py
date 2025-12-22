@@ -11,7 +11,6 @@ from rss_bot.utils import load_config
 from rss_bot.rss import RSSReader
 from rss_bot.message import format_entry_for_discord
 from rss_bot.models import FeedConfig
-
 import yaml 
 load_dotenv()
 
